@@ -11,10 +11,12 @@ public class ItemSlotBase : MonoBehaviour, IDropHandler
     }
     public void OnDrop(PointerEventData eventData)
     {
-        if (eventData != null && !slotOccupied) 
-        {
-            //If this slot is not occupied then set the position of the object to the slot's position
-            eventData.pointerDrag.GetComponent<RectTransform>().position = GetComponent<RectTransform>().position;
+        if (!CleaningSpray.Instance.sprayMode) {
+            if (eventData != null && !slotOccupied)
+            {
+                //If this slot is not occupied then set the position of the object to the slot's position
+                eventData.pointerDrag.GetComponent<RectTransform>().position = GetComponent<RectTransform>().position;
+            }
         }
     }
 }

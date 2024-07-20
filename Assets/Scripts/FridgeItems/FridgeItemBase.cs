@@ -26,46 +26,56 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        //Set the item that is being dragged as transparent
-        canvasGroup.alpha = 0.6f;
-        //Set the raycasts off to detect droppable objects
-        canvasGroup.blocksRaycasts = false;
-
-        //Cache the current position of the draggable object to reset when requried
-        resetPosition = eventData.pointerDrag.GetComponent<RectTransform>().position;
-
-        if (eventData.pointerEnter!= null  && eventData.pointerEnter.GetComponent<ItemSlotBase>()!= null) 
+        if (!CleaningSpray.Instance.sprayMode)
         {
-            //If object belongs to a slot, cache it
-            currentSlot = eventData.pointerEnter.GetComponent<ItemSlotBase>();
+            //Set the item that is being dragged as transparent
+            canvasGroup.alpha = 0.6f;
+            //Set the raycasts off to detect droppable objects
+            canvasGroup.blocksRaycasts = false;
+
+            //Cache the current position of the draggable object to reset when requried
+            resetPosition = eventData.pointerDrag.GetComponent<RectTransform>().position;
+
+            if (eventData.pointerEnter != null && eventData.pointerEnter.GetComponent<ItemSlotBase>() != null)
+            {
+                //If object belongs to a slot, cache it
+                currentSlot = eventData.pointerEnter.GetComponent<ItemSlotBase>();
+            }
         }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
         //Move the object with mouse/touch
-        rectTransform.anchoredPosition += eventData.delta/canvas.scaleFactor;
+        if (!CleaningSpray.Instance.sprayMode)
+        {
+            rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
+        }
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        canvasGroup.alpha = 1f;
-        canvasGroup.blocksRaycasts = true;
-        ItemSlotBase slot = eventData.pointerEnter.GetComponent<ItemSlotBase>();
-
-        //If no slot is detected or the slot is already occupied, then reset the position of the object
-        if (eventData.pointerEnter == null || slot == null || slot.slotOccupied)
+        if (!CleaningSpray.Instance.sprayMode)
         {
-            ResetPosition();
-        }
+            canvasGroup.alpha = 1f;
+            canvasGroup.blocksRaycasts = true;
 
-        //else set the previous slot as unoccupied and set the new slot as current slot 
-        else 
-        {
-            if(currentSlot!=null)
-                currentSlot.slotOccupied = false;
-            currentSlot = slot;
-            currentSlot.slotOccupied = true;
+            //If no slot is detected or the slot is already occupied, then reset the position of the object
+            if (eventData.pointerEnter == null || eventData.pointerEnter.GetComponent<ItemSlotBase>() == null || eventData.pointerEnter.GetComponent<ItemSlotBase>().slotOccupied)
+            {
+                ResetPosition();
+            }
+
+            //else set the previous slot as unoccupied and set the new slot as current slot 
+            else
+            {
+                ItemSlotBase slot = eventData.pointerEnter.GetComponent<ItemSlotBase>();
+
+                if (currentSlot != null)
+                    currentSlot.slotOccupied = false;
+                currentSlot = slot;
+                currentSlot.slotOccupied = true;
+            }
         }
     }
 
