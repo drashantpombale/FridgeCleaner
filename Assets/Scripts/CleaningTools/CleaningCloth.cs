@@ -1,13 +1,15 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class CleaningSpray : MonoBehaviour
+public class CleaningCloth : MonoBehaviour
 {
     [SerializeField]
     private ParticleSystem particle;
 
     [SerializeField]
-    private GameObject sprayImage;
+    private GameObject clothImage;
 
     [SerializeField]
     private Slider loadingBar;
@@ -15,35 +17,37 @@ public class CleaningSpray : MonoBehaviour
     float currentProgress;
 
     private float completionTime = 3f;
-    public void SprayModeOn() 
-    {
-        ModeController.Instance.SprayMode();
-        sprayImage.gameObject.SetActive(true);
-    }
-    
-    public void SprayModeOff() 
-    {
-        ModeController.Instance.ResetMode();
-        sprayImage.gameObject.SetActive(false);
-    }
 
     private void Start()
     {
-        ModeController.Instance.resetEvent.AddListener(SprayModeOff);
+        ModeController.Instance.resetEvent.AddListener(CleanModeOff);    
     }
+
+    public void CleanModeOn()
+    {
+        ModeController.Instance.CleanMode();
+        clothImage.gameObject.SetActive(true);
+    }
+
+    public void CleanModeOff()
+    {
+        ModeController.Instance.ResetMode();
+        clothImage.gameObject.SetActive(false);
+    }
+
 
     // Update is called once per frame
     void Update()
     {
-        if (ModeController.Instance.currentMode == ModeController.GameMode.SprayMode)
+        if (ModeController.Instance.currentMode == ModeController.GameMode.CleanMode)
         {
-            if (Input.GetMouseButton(0) || (Input.touchCount>0 && Input.GetTouch(0).phase==TouchPhase.Began))
+            if (Input.GetMouseButton(0) || (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
             {
                 if (!particle.isPlaying)
                 {
                     particle.Play();
                 }
-                else 
+                else
                 {
                     if (currentProgress < 3)
                     {
@@ -51,13 +55,13 @@ public class CleaningSpray : MonoBehaviour
                         loadingBar.value = (currentProgress / 3);
                         currentProgress += Time.deltaTime;
                         if (currentProgress >= 3)
-                            GameController.Instance.SprayFinished = true;
+                            GameController.Instance.CleanFinished = true;
                     }
                     Vector3 screenPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-                    sprayImage.transform.position = new Vector3(screenPos.x, screenPos.y, 0);
+                    clothImage.transform.position = new Vector3(screenPos.x, screenPos.y, 0);
                 }
             }
-            else 
+            else
             {
                 if (particle.isPlaying)
                 {
@@ -66,6 +70,6 @@ public class CleaningSpray : MonoBehaviour
                 }
             }
         }
-       
+
     }
 }

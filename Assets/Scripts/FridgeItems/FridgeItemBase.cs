@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
 /// Base class for fridge items
@@ -17,6 +18,10 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
 
     private Vector2 resetPosition;
 
+    private bool isExpired;
+
+    private bool wasRemoved;
+
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
@@ -24,9 +29,24 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
         canvasGroup = GetComponent<CanvasGroup>();
     }
 
+    private void Start()
+    {
+        Image itemImage = GetComponent<Image>();
+        float randomNumber = Random.Range(-1, 1);
+        if (randomNumber < 0)
+        {
+            if (GameController.Instance.expiredItems < 3)
+            {
+                itemImage.color = Color.red;
+                isExpired = true;
+                GameController.Instance.ItemExpired();
+            }
+        }
+    }
+
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (!CleaningSpray.Instance.sprayMode)
+        if (ModeController.Instance.currentMode == ModeController.GameMode.Default)
         {
             //Set the item that is being dragged as transparent
             canvasGroup.alpha = 0.6f;
@@ -47,7 +67,7 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
     public void OnDrag(PointerEventData eventData)
     {
         //Move the object with mouse/touch
-        if (!CleaningSpray.Instance.sprayMode)
+        if (ModeController.Instance.currentMode == ModeController.GameMode.Default)
         {
             rectTransform.anchoredPosition += eventData.delta / canvas.scaleFactor;
         }
@@ -55,7 +75,7 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (!CleaningSpray.Instance.sprayMode)
+        if (ModeController.Instance.currentMode == ModeController.GameMode.Default)
         {
             canvasGroup.alpha = 1f;
             canvasGroup.blocksRaycasts = true;
@@ -75,6 +95,7 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
                     currentSlot.slotOccupied = false;
                 currentSlot = slot;
                 currentSlot.slotOccupied = true;
+                wasRemoved = true;
             }
         }
     }

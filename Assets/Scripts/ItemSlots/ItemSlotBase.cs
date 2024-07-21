@@ -11,7 +11,7 @@ public class ItemSlotBase : MonoBehaviour, IDropHandler
     }
     public void OnDrop(PointerEventData eventData)
     {
-        if (!CleaningSpray.Instance.sprayMode) {
+        if (ModeController.Instance.currentMode == ModeController.GameMode.Default) {
             if (eventData != null && !slotOccupied)
             {
                 //If this slot is not occupied then set the position of the object to the slot's position
