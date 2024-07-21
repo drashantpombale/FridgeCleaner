@@ -18,9 +18,11 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
 
     private Vector2 resetPosition;
 
-    private bool isExpired;
+    public bool isExpired { get; private set; }
 
-    private bool wasRemoved;
+    public bool wasRemoved { get; private set; }
+
+    public bool wasRestocked { get; private set; }
 
     private void Awake()
     {
@@ -96,12 +98,20 @@ public class FridgeItemBase : MonoBehaviour, IPointerDownHandler, IDragHandler, 
                 currentSlot = slot;
                 currentSlot.slotOccupied = true;
                 wasRemoved = true;
+                SoundManager.Instance.PlaySFX(SoundManager.Instance.itemSound, false);
+                if(currentSlot.GetType()!=typeof(FridgeSlot))
+                    GameController.Instance.IsTaskOver(GameController.GameStage.ItemsRemoved);
             }
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+    }
+
+    public void Restocked()
+    {
+        wasRestocked = true;
     }
 
     /// <summary>

@@ -11,8 +11,13 @@ public class DiscardSlotBase : MonoBehaviour, IDropHandler
     {
         if (eventData != null) 
         {
-            Destroy(eventData.pointerDrag);
-            Debug.Log("Object discarded");
+            if (GameController.Instance.DiscardItem(eventData.pointerDrag.GetComponent<FridgeItemBase>()))
+            {
+                Destroy(eventData.pointerDrag);
+                Debug.Log("Object discarded");
+
+                GameController.Instance.IsTaskOver(GameController.GameStage.ExpiredItemsDiscarded);
+            }
         }
     }
 }

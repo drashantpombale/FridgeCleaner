@@ -14,11 +14,15 @@ public class CleaningSpray : MonoBehaviour
 
     float currentProgress;
 
+    [SerializeField]
     private float completionTime = 3f;
     public void SprayModeOn() 
     {
-        ModeController.Instance.SprayMode();
-        sprayImage.gameObject.SetActive(true);
+        if (GameController.Instance.AreItemsShelved() && GameController.Instance.AreExpiredItemsDiscarded())
+        {
+            ModeController.Instance.SprayMode();
+            sprayImage.gameObject.SetActive(true);
+        }
     }
     
     public void SprayModeOff() 
@@ -42,16 +46,20 @@ public class CleaningSpray : MonoBehaviour
                 if (!particle.isPlaying)
                 {
                     particle.Play();
+                    SoundManager.Instance.PlaySFX(SoundManager.Instance.spraySound, true);
                 }
                 else 
                 {
                     if (currentProgress < 3)
                     {
                         loadingBar.gameObject.SetActive(true);
-                        loadingBar.value = (currentProgress / 3);
+                        loadingBar.value = (currentProgress / completionTime);
                         currentProgress += Time.deltaTime;
                         if (currentProgress >= 3)
+                        {
                             GameController.Instance.SprayFinished = true;
+                            GameController.Instance.IsTaskOver(GameController.GameStage.SparyingDone);
+                        }
                     }
                     Vector3 screenPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
                     sprayImage.transform.position = new Vector3(screenPos.x, screenPos.y, 0);
@@ -59,6 +67,7 @@ public class CleaningSpray : MonoBehaviour
             }
             else 
             {
+                SoundManager.Instance.StopSFX();
                 if (particle.isPlaying)
                 {
                     particle.Stop();
